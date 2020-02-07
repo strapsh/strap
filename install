@@ -12,7 +12,7 @@ mkdir -p "$releases_dir"
 file="$releases_dir/${STRAP_RELEASE_REF}.zip"
 rm -rf "$file"
 
-STRAP_RELEASE_URL="https://github.com/ultimatedotfiles/strap/archive/${STRAP_RELEASE_REF}.zip"
+STRAP_RELEASE_URL="https://github.com/strapsh/strap/archive/${STRAP_RELEASE_REF}.zip"
 
 if command -v wget >/dev/null; then
   wget -qO "$file" "$STRAP_RELEASE_URL"

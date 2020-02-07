@@ -94,7 +94,7 @@ STRAP_GIT_NAME="$(id -F)"
 STRAP_GIT_EMAIL=
 STRAP_GITHUB_USER=
 STRAP_GITHUB_TOKEN=
-STRAP_ISSUES_URL="https://github.com/ultimatedotfiles/strap/issues/new"
+STRAP_ISSUES_URL="https://github.com/strapsh/strap/issues/new"
 
 STRAP_FULL_PATH="$(strap::fs::path "${BASH_SOURCE[0]}")"
 

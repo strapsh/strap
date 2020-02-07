@@ -37,7 +37,7 @@ STRAP_SUCCESS=''
 STRAP_QUIET_FLAG="-q"
 Q="$STRAP_QUIET_FLAG"
 
-STRAP_ISSUES_URL="https://github.com/ultimatedotfiles/strap/issues/new"
+STRAP_ISSUES_URL="https://github.com/strapsh/strap/issues/new"
 STRAP_LANSIBLE_DEFAULT_PLAYBOOK=".strap/ansible/playbooks/default/main.yml"
 
 function array_contains() {

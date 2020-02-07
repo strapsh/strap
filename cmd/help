@@ -145,7 +145,7 @@ main() {
     print_summaries help run version
     echo
     echo "See \`strap help <command>' for information on a specific command."
-    echo "For full documentation, see: https://github.com/ultimatedotfiles/strap#readme"
+    echo "For full documentation, see: https://github.com/strapsh/strap#readme"
   else
     command="$arg"
     command_path="$STRAP_CMD_DIR/$command"

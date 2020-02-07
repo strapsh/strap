@@ -25,13 +25,13 @@ Here's a little `strap run` recording to whet your appetite for the things Strap
 If you want, you can run it immediately:
     
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ultimatedotfiles/strap/master/run | bash
+curl -fsSL https://raw.githubusercontent.com/strapsh/strap/master/run | bash
 ```
     
 Or if you have custom hooks to run as well:
     
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ultimatedotfiles/strap/master/run | bash -s -- --with-hook-package='com.github.myorg:myrepo:gitref'
+curl -fsSL https://raw.githubusercontent.com/strapsh/strap/master/run | bash -s -- --with-hook-package='com.github.myorg:myrepo:gitref'
 ```
 
 Or you can install it manually.
@@ -39,7 +39,7 @@ Or you can install it manually.
 ## Manual Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ultimatedotfiles/strap/master/install | bash
+curl -fsSL https://raw.githubusercontent.com/strapsh/strap/master/install | bash
 ```
 
 Then set the following in ~/.bash_profile, ~/.bashrc or ~/.zshrc (or whatever you prefer):
@@ -150,7 +150,7 @@ commands:
    version     Display the version of strap
  
 See `strap help <command>' for information on a specific command.
-For full documentation, see: https://github.com/ultimatedotfiles/strap
+For full documentation, see: https://github.com/strapsh/strap
 ```
 
 The `strap` command itself is quite simple - it basically loads some common environment settings and that's pretty 
@@ -182,7 +182,7 @@ The package identifier string format MUST adhere to the following definition:
     group-id = "com.github." github-account-name
     
 where
- * `github-account-name` equals a valid github username or organization name, for example `jsmith` or `ultimatedotfiles`
+ * `github-account-name` equals a valid github username or organization name, for example `jsmith` or `strapsh`
  * `package-name` equals a git repository name within the specified github account, for example `cool-package`
  * `package-version`, if present, equals a git [refname](https://git-scm.com/docs/gitrevisions#gitrevisions-emltrefnamegtemegemmasterememheadsmasterememrefsheadsmasterem) that MUST be a tag, branch
     or commit sha that can be provided as an argument to `git checkout`.
@@ -193,7 +193,7 @@ defined in the [Semantic Versioning 2.0.0 specification](https://semver.org/spec
 Some examples:
 
  * `com.github.acme:hello:0.2.1`
- * `com.github.ultimatedotfiles:cool-package:1.0.3`
+ * `com.github.strapsh:cool-package:1.0.3`
 
 > NOTE: we realize it is a rather constrictive requirement to have all packages hosted on github and conform to the
   specified location and naming scheme.  These restrictions will be relaxed when Strap's functionality

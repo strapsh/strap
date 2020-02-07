@@ -143,7 +143,7 @@ strap::github::api::token::create() {
 
     utc_date="$(date -u +%FT%TZ)"
     token_description="Strap auto-generated token created at $utc_date for $machine_desc"
-    request_body="{\"scopes\":[\"repo\",\"admin:org\",\"admin:public_key\",\"admin:repo_hook\",\"admin:org_hook\",\"gist\",\"notifications\",\"user\",\"delete_repo\",\"admin:gpg_key\"],\"note\":\"$token_description\",\"note_url\":\"https://github.com/ultimatedotfiles/strap\"}"
+    request_body="{\"scopes\":[\"repo\",\"admin:org\",\"admin:public_key\",\"admin:repo_hook\",\"admin:org_hook\",\"gist\",\"notifications\",\"user\",\"delete_repo\",\"admin:gpg_key\"],\"note\":\"$token_description\",\"note_url\":\"https://github.com/strapsh/strap\"}"
     response="$(curl --silent --show-error -i -u "$creds" -H 'Content-Type: application/json' -X POST -d "$request_body" https://api.github.com/authorizations)"
     status_code="$(echo "$response" | head -1 | awk '{print $2}')"
     headers="$(echo "$response" | sed "/^\s*$(printf '\r')*$/q" | sed '/^[[:space:]]*$/d' | tail -n +2)"
@@ -169,7 +169,7 @@ strap::github::api::token::create() {
           #try again with the OTP code:
           utc_date="$(date -u +%FT%TZ)"
           token_description="Strap auto-generated token created at $utc_date for $machine_desc"
-          request_body="{\"scopes\":[\"repo\",\"admin:org\",\"admin:public_key\",\"admin:repo_hook\",\"admin:org_hook\",\"gist\",\"notifications\",\"user\",\"delete_repo\",\"admin:gpg_key\"],\"note\":\"$token_description\",\"note_url\":\"https://github.com/ultimatedotfiles/strap\"}"
+          request_body="{\"scopes\":[\"repo\",\"admin:org\",\"admin:public_key\",\"admin:repo_hook\",\"admin:org_hook\",\"gist\",\"notifications\",\"user\",\"delete_repo\",\"admin:gpg_key\"],\"note\":\"$token_description\",\"note_url\":\"https://github.com/strapsh/strap\"}"
           response="$(curl --silent --show-error -i -u "$creds" -H "X-GitHub-OTP: $two_factor_code" -H 'Content-Type: application/json' -X POST -d "$request_body" https://api.github.com/authorizations)"
           status_code="$(echo "$response" | head -1 | awk '{print $2}')"
           headers="$(echo "$response" | sed "/^\s*$(printf '\r')*$/q" | sed '/^[[:space:]]*$/d' | tail -n +2)"

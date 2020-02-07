@@ -4,7 +4,7 @@ STRAP_RELEASE_REF="${STRAP_RELEASE_REF:-}"
 [ -z "$STRAP_RELEASE_REF" ] && STRAP_RELEASE_REF='master'
 export STRAP_RELEASE_REF # make available to the install script
 
-STRAP_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/ultimatedotfiles/strap/${STRAP_RELEASE_REF}/install"
+STRAP_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/strapsh/strap/${STRAP_RELEASE_REF}/install"
 
 if command -v wget >/dev/null; then
   wget -qO- "$STRAP_INSTALL_SCRIPT_URL" | bash

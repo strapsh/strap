@@ -136,25 +136,25 @@ setup() {
 }
 
 @test "pkg: ensure fails with missing git repo" {
-  run strap::pkg::ensure 'com.github.ultimatedotfiles:straps:0.0.1' #invalid id - no 'straps' repo
+  run strap::pkg::ensure 'com.github.strapsh:straps:0.0.1' #invalid id - no 'straps' repo
   [ "$status" -ne 0 ]
 }
 
 @test "pkg: ensure succeeds with HEAD rev" {
-  run strap::pkg::ensure 'com.github.ultimatedotfiles:strap'
+  run strap::pkg::ensure 'com.github.strapsh:strap'
   #echo "# output: $output" >&3
   [ "$status" -eq 0 ]
-  dir="$STRAP_USER_HOME/packages/com/github/ultimatedotfiles/strap/HEAD"
+  dir="$STRAP_USER_HOME/packages/com/github/strapsh/strap/HEAD"
   [ -d "$dir" ]
   rm -rf "$dir"
 }
 
 @test "pkg: ensure calls git fetch with existing HEAD directory" {
 
-  local -r parent_dir="$STRAP_USER_HOME/packages/com/github/ultimatedotfiles/strap"
+  local -r parent_dir="$STRAP_USER_HOME/packages/com/github/strapsh/strap"
   local -r dir="$parent_dir/HEAD"
 
-  strap::pkg::ensure 'com.github.ultimatedotfiles:strap'
+  strap::pkg::ensure 'com.github.strapsh:strap'
   [ -d "$dir" ] #ensure dir was created as expected
 
   local branch="$(cd "$dir"; git branch | grep '*')"
@@ -162,7 +162,7 @@ setup() {
 
   $(cd "$dir"; git checkout dummy-for-ci-do-not-delete >/dev/null) # change it to something else
 
-  run strap::pkg::ensure 'com.github.ultimatedotfiles:strap'
+  run strap::pkg::ensure 'com.github.strapsh:strap'
   [ "$status" -eq 0 ]
   [ -d "$dir" ]
 
