@@ -1,18 +1,18 @@
-# Strap: The Ultimate Dotfiles Framework
+# Strap: Bootstrap Your Machine with One Command
 
-> **_NOTE:_**  Strap is currently being ported from a previous version.  It currently works, but it doesn't install very much.  Yet.
+`strap` is a simple shell command designed to do one thing: 
 
-`strap` is a dotfiles framework that is designed to do one thing extremely well: 
-
-Strap will take your machine from a zero state (e.g. right after you buy it or receive it from your 
+Strap will take your machine from a starting state (for example, right after you buy it or receive it from your 
 employer) and install and configure everything you want on your machine in a *single command*, in *one shot*.  Run 
-strap and you can rest assured that your machine will have your favorite command line tools, system defaults, gui 
+`strap` and you can rest assured that your machine will have your favorite command line tools, system defaults, gui 
 applications, and development tools installed and ready to go.
 
 Strap was initially created to help newly-hired software engineers get up and running and
 productive in *minutes* after they receive their machine instead of the hours or days it usually takes.  But Strap
 isn't limited to software engineering needs - anyone can use Strap to install what they want - graphics software, 
-video editing, web browsers, whatever.
+office suites, web browsers, whatever.
+
+<!-- 
 
 ## Watch It Run!
 
@@ -20,133 +20,55 @@ Here's a little `strap run` recording to whet your appetite for the things Strap
 
 [![asciicast](https://asciinema.org/a/188040.png)](https://asciinema.org/a/188040)
 
-## Run It
-
-If you want, you can run it immediately:
-    
-```bash
-curl -fsSL https://raw.githubusercontent.com/strapsh/strap/master/run | bash
-```
-    
-Or if you have custom hooks to run as well:
-    
-```bash
-curl -fsSL https://raw.githubusercontent.com/strapsh/strap/master/run | bash -s -- --with-hook-package='com.github.myorg:myrepo:gitref'
-```
-
-Or you can install it manually.
-
-## Manual Installation
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/strapsh/strap/master/install | bash
-```
-
-Then set the following in ~/.bash_profile, ~/.bashrc or ~/.zshrc (or whatever you prefer):
-
-```bash
-export PATH="$HOME/.strap/releases/current/bin:$PATH"
-```
+-->
 
 ## Overview
 
-How does strap work?
+At the highest level:
 
-### It's Just Bash, Man
+**strap is a shell command that does the _bare minimum necessary_ to ensure 
+[Ansible](https://docs.ansible.com/ansible/latest/index.html) is available and then immediately runs 
+ansible to setup (aka 'converge') the local machine**.
 
-Strap is a command line tool with a set of sub-commands and packages written in 100% Bash scripts to ensure it can run
-out of the box on pretty much any Mac or Linux machine created in the last few years.  It doesn't require Ruby, 
-Python, Java or any other tool to be installed on your box first in order to run (but you can install those 
-with Strap as you see fit). Strap should work on any machine with Bash 3.2.57 or later.
+In this sense, we're not reinventing the wheel - there are plenty of machine convergence tools out there already, and
+it's best to just use one of them, like Ansible.
 
-That said, don't worry if you prefer zsh or any other shell.  Bash is just used to write and run strap - you 
-can install and use zsh or any other shell you prefer.
+The only difference with strap is that strap covers the 'last mile' to obtain Ansible in a generic way that:
 
-### Built on the Shoulders of Giants
+1. Ensures anyone can run it without knowing what Ansible is
+1. Doesn't interfere with system or user-specific Ansible installations if there are any.
+1. Ensures that the fastest way to remove it is to just delete the `~/.strap` directory.
 
-Don't worry, we're not re-inventing the wheel.
- 
-Strap is mostly a set of really convenient wrapper functions
-and commands built on top of homebrew.  Strap fills a really important gap: while homebrew is primarily concerned with 
-managing packages on your machine, Strap leverages that and also enables user and machine-specific configuration for 
-those packages.
+As soon as Ansible is available, strap immediately delegates to it, automatically running one or more Ansible 
+[playbooks](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html) or 
+[roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html) on the local machine.
 
-For example, you might have installed a homebrew package and then in its output, that package says something like:
+And we think that's pretty great - installing Ansible or Python is not always a trivial exercise, and we wanted to
+ensure things 'just work', even if someone has never even heard of Python or Ansible.  It's so easy to use, anyone
+can use it - from setting up a machine, or just installing things for a particular project, etc.
 
-> After this is installed, modify your ~/.bash_profile or ~/.zshrc to include the following init line...
+## Installation
 
-Well, that's nice, but shouldn't that part be automated too?  Also what about operating system default configuration?
-That's not a software package, it's configuration, and homebrew mostly doesn't address those concerns.  But Strap does.
+To install strap, run the following on the command line:
 
-Strap is homebrew + automating 'the last mile' to get you to an ideally-configured machine without
-having to work. It is basically: "I want to use one command and that's it.  If you need something from me, 
-prompt me, but don't make me do any work at all beyond that."  Now that's what we're talking about!
-
-### Declarative Configuration
-
-Even though Strap is built with bash, you don't have to know bash at all to use it.  Once installed, Strap looks 
-at an easy-to-understand `strap.yml` configuration file that lists every thing you want installed or modified
-on your system.
-
-It reads this list and *converges* your machine to have the same state represented in the `strap.yml` file:  If 
-something in the strap.yml file already exists on your machine, strap just skips it.  If something in the file doesn't
-exist yet, strap will install it for you.  It can automatically upgrade things for you too.
-
-This means Strap is *idempotent* - you can run it over and over again, and your machine will be in your desired state
-every time you run it. Nice! 
-
-Based on this, you can (and should) run strap regularly to ensure your system is configured how you want it and your 
-software is up-to-date at all times.
-
-### Pack It Up, Pack It In
-
-Strap was purposefully designed to have a very lean core and delegate most functionality to packages.  Why 
-is this important?
-
-*Because you can extend Strap for your needs*.
-
-That's right - if Strap doesn't have something you need, you can write a simple bash package to provide it.  Strap
-gives you the ability to package up your bash functions, version them, and supply them to other Strap packages.  This
-means Strap supports import-like behavior: a package can depend on other packages and *import* those
-packages' library functions and variables.
-
-Additionally, a Strap package can contain scripts that hook in to Strap's run lifecycle, kind of like a 'plugin'. This 
-allows you to extend and enhance functionality that may not be in Strap by default.
-
-And this helps prevent lock-in.  It allows you to get what you need on your timeline without waiting on anyone.  And it 
-allows for a community to grow and provide open-source packages we can all benefit from.  And packages are 
-just folders, so they can be created as simply as creating a new git repository.  And because 
-GitHub is pretty much the de-facto git origin for open-source software these days, Strap has native git and GitHub 
-integration too.
-
-### Customization and Privacy
-
-Because Strap is pluggable, you can 'point' it to any strap-compatible git repository.  This means that you can
-have your own git repo that represents the customizations you care about.  And you can share this with the world so 
-others can have awesome machine setups just like you.
-
-But sometimes you (or companies) don't want the world to see what is installed on a machine for privacy or 
-security reasons.  If this is a concern for you, you can host your Strap configuration and packages in a private git 
-repository. Because of Strap's native GitHub integration, it can securely authenticate with GitHub and utilize your 
-private git repositories (assuming your GitHub user account has access to said repositories).
-
-You can even mix and match repositories: use Strap's defaults, then add in your company's private repository, then 
-finally add in your personal repository to fill in any remaining missing gaps.  Any number of sources can be used 
-during a strap run for machine convergence.
+```bash
+curl -fsSL https://raw.githubusercontent.com/strapsh/strap/master/install | bash
+source "$HOME/.strap/etc/straprc"
+```
 
 ## Usage
 
 Strap is a command line tool.  Assuming the strap installation's `bin` directory is in your `$PATH` as shown in the
-installation instructions above, you can just type `strap` and see what happens:
+installation instructions above, you can just type `strap --help` and see what happens:
 
 ```bash
-me@myhost:~$ strap
-strap version 0.0.1
+me@myhost:~$ strap --help
+strap version 0.3.6
 usage: strap [options...] <command> [command_options...]
  
 commands:
    help        Display help for a command
-   run         Runs strap to ensure your machine is fully configured
+   run         Runs strap to ensure your machine is configured
    version     Display the version of strap
  
 See `strap help <command>' for information on a specific command.
@@ -155,8 +77,73 @@ For full documentation, see: https://github.com/strapsh/strap
 
 The `strap` command itself is quite simple - it basically loads some common environment settings and that's pretty 
 much it. From there, it delegates most functionality to sub-commands, very similar to how the `git` command-line tool 
-works.  The sub-commands available to you are the combined set of Strap's built-in sub-commands and any sub-commands 
-made available by any Strap packages you reference.
+works.
+
+## Strap Run
+
+`strap run` ensures ansible is available and then immediately runs ansible to converge the local machine to a desired state.
+
+This means that, even though one or more people can use `run strap` without knowing anything
+about ansible (a great benefit to teams), at least one person needs to know how
+to _write_ ansible "packages" that will be used during a strap run.  These "packages" in ansible's 
+terminology are called _playbooks_ and _roles_.
+
+Once a playbook or role is identified or available locally, strap makes running them that much easier.  You can run 
+ansible playbooks and roles based on the directory where strap is run or by explicitly referencing them by id.
+
+### Working Directory
+
+If you just type `strap run` (without any arguments) in a working directory, and that directory has an ansible playbook 
+available via the relative path:
+
+```bash
+.strap/ansible/playbooks/default/main.yml
+```
+
+then strap will run that playbook automatically.
+
+It does the following steps in order:
+
+1.  If a `.strap/ansible/playbooks/default/meta/requirements.yml` file exists that lists the 
+    [playbook's role dependencies](https://galaxy.ansible.com/docs/using/installing.html#installing-multiple-roles-from-a-file),
+    those requirements will be automatically downloaded first using the
+    [ansible-galaxy command](https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html).
+    
+    **Strap enhancement**: Strap has a really nice feature that enables [transitive role dependency downloads](https://github.com/lhazlewood/ansible-galaxy-install):  if
+    a dependency role is downloaded, and that role in turn has a `meta/requirements.yml` file, Strap will _automatically_
+    transitively download _those_ dependencies that don't yet exist.  It will continue to walk the dependency tree, 
+    downloading dependencies as necessary until all dependencies are resolved.
+    
+    Core ansible does not provide transitive resolution, but Strap does.
+
+1. Strap will call the `ansible-playbook` command with the discovered playbook file targeting localhost/127.0.0.1.
+
+### Specific Roles or Playbooks
+
+If the working directory does not have a `.strap/ansible/playbooks/default/main.yml` playbook file, then you must
+specify one or more roles or playbooks using the `--playbook` or `--role` arguments, i.e.
+
+```bash
+strap run [--playbook|--role] <id>
+```
+
+where `<id>` is an Ansible Galaxy identifier (i.e. `username.rolename`) or a GitHub url fragment that identifies the
+role or playbook's git repository, (i.e. `username/repo`).
+
+For example:
+
+```bash
+strap run --role geerlinguy.java
+```
+
+or
+
+```bash
+strap run --playbook example/foo
+```
+
+
+<!-- 
 
 ## Strap Packages
 
@@ -325,3 +312,4 @@ The above tree shows the following:
   
   We will cover how to import package library scripts soon.
   
+ -->

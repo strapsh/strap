@@ -118,21 +118,6 @@ strap::lib::import fonts || . ../lib/fonts.sh
 strap::lib::import logging || . ../lib/logging.sh
 strap::lib::import io || . ../lib/io.sh
 
-#shopt -s nullglob
-# Plugins
-#for plugin_bin in "${STRAP_ROOT}/plugins/"*/bin; do
-#  bin_path="${bin_path}:${plugin_bin}"
-#done
-#export PATH="${bin_path}:${PATH}"
-
-# Hooks
-#hook_path="${STRAP_HOOK_PATH}"
-#for plugin_hook in "${STRAP_ROOT}/plugins/"*/etc/strap.d; do
-#  hook_path="${hook_path}:${plugin_hook}"
-#done
-#export STRAP_HOOK_PATH="$hook_path"
-#shopt -u nullglob
-
 command="${1:-}"
 retval=0
 case "$command" in

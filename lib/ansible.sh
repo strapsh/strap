@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-set -Eeuo pipefail # https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
 
+set -Eeuo pipefail # https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
 if ! command -v strap::lib::import >/dev/null; then
   echo "This file is not intended to be run or sourced outside of a strap execution context." >&2
   [[ "${BASH_SOURCE[0]}" != "${0}" ]] && return 1 || exit 1 # if sourced, return 1, else running as a command, so exit
 fi
+
 strap::lib::import logging || . logging.sh
 strap::lib::import lang || . lang.sh
 strap::lib::import fs || . fs.sh
@@ -27,10 +28,7 @@ STRAP_ANSIBLE_GALAXY_INSTALL_SCRIPT_URL="${STRAP_ANSIBLE_GALAXY_INSTALL_SCRIPT_U
 STRAP_ANSIBLE_ROLES_DIR="${STRAP_ANSIBLE_DIR}/roles"
 STRAP_ANSIBLE_PLAYBOOKS_DIR="${STRAP_ANSIBLE_DIR}/playbooks"
 STRAP_ANSIBLE_IMPLICIT_PLAYBOOK_DIR="${STRAP_ANSIBLE_PLAYBOOKS_DIR}/.implicit"
-STRAP_ANSIBLE_GITHUB_URL_PREFIX="${STRAP_ANSIBLE_GITHUB_URL_PREFIX:-}"
-if [[ -z "${STRAP_ANSIBLE_GITHUB_URL_PREFIX}" ]]; then
-  STRAP_ANSIBLE_GITHUB_URL_PREFIX='https://github.com/'
-fi
+STRAP_ANSIBLE_GITHUB_URL_PREFIX="${STRAP_ANSIBLE_GITHUB_URL_PREFIX:-https://github.com/}"
 
 set -a
 
@@ -116,12 +114,12 @@ function strap::ansible::roles::run() {
     case "$1" in
       --role|--with-role)
         role_id="${2:-}"
-        [[ -n "${role_id}" && "${role_id}" != '-'* ]] || strap::abort "strap lansible: $1 argument requires a value"
+        [[ -n "${role_id}" && "${role_id}" != '-'* ]] || strap::abort "strap run: $1 argument requires a value"
         role_ids+=("${role_id}")
         shift 2
         ;;
       -i|--inventory|--inventory-file)
-        strap::abort "strap lansible: $1 is not supported since localhost is always used (lansible = 'localhost ansible')."
+        strap::abort "strap run: $1 is not supported since localhost is always used."
         ;;
       -K|--ask-become-pass) # ignore - we add this no matter what
         shift
@@ -288,11 +286,11 @@ strap::ansible::playbook::run() {
     case "$1" in
       --playbook|--with-playbook)
         playbook_file="${2}"
-        [[ -f "${playbook_file}" ]] || strap::abort "strap lansible: ${playbook_file} doesn't exist!"
+        [[ -f "${playbook_file}" ]] || strap::abort "strap run: ${playbook_file} doesn't exist!"
         shift 2
         ;;
       -i|--inventory|--inventory-file)
-        strap::abort "strap lansible: $1 is not supported since localhost is always used (lansible = 'localhost ansible')."
+        strap::abort "strap run: $1 is not supported since localhost is always used."
         ;;
       -K|--ask-become-pass) # ignore - we add this no matter what
         shift

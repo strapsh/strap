@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
 set -Eeuo pipefail # https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
-command -v strap::lib::import >/dev/null || { echo "strap::lib::import is not available" >&2; exit 1; }
+if ! command -v strap::lib::import >/dev/null; then
+  echo "This file is not intended to be run or sourced outside of a strap execution context." >&2
+  [[ "${BASH_SOURCE[0]}" != "${0}" ]] && return 1 || exit 1 # if sourced, return 1, else running as a command, so exit
+fi
+
 strap::lib::import logging || . logging.sh
 
 set -a

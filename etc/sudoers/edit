@@ -30,7 +30,7 @@ main() {
   local -r cleanup_script="$1"
 
   [[ "$(whoami)" != "root" ]] && echo "This script must be run via sudo." >&2 && exit 1
-  [[ -z "$cleanup_script" ]] && echo "This script must be specified with one argument that equals the fully qualfied cleanup script path" >&2 && exit 1
+  [[ -z "$cleanup_script" ]] && echo "This script must be specified with one argument that equals the fully qualified cleanup script path" >&2 && exit 1
   [[ "$cleanup_script" = *" "* ]] && echo "Cleanup script path argument cannot contain spaces: '$cleanup_script'" >&2 && exit 1
   [[ ! -x "$cleanup_script" ]] && echo "Specified argument '$cleanup_script' is not an executable file" >&2 && exit 1
 

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
 set -Eeuo pipefail # https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
+if ! command -v strap::lib::import >/dev/null; then
+  echo "This file is not intended to be run or sourced outside of a strap execution context." >&2
+  [[ "${BASH_SOURCE[0]}" != "${0}" ]] && return 1 || exit 1 # if sourced, return 1, else running as a command, so exit
+fi
+
 strap::lib::import fonts || . fonts.sh
 
 set -a
@@ -48,6 +53,96 @@ strap::abort() {
     ((i++))
   done
   exit 1
+}
+
+function strap::err::print() {
+  local msg plain=false
+  if [[ "${1:-}" == "--plain" ]]; then
+    plain=true
+    shift
+  fi
+  if [[ ! -t 2 || "${plain}" == true || $# -eq 0 ]]; then # not a terminal or explicitly requested no color output:
+    msg="$@"
+  else # otherwise use color output:
+    msg="${FONT_RED}${@}${FONT_CLEAR}"
+  fi
+  printf '%s' "${msg}" >&2
+}
+
+function strap::err::println() {
+  [[ $# -eq 0 ]] || strap::err::print "$@"
+  printf '\n' >&2
+}
+
+function strap::err::exit() {
+  [[ $# -eq 0 ]] || strap::err::println "$@"
+  exit 1
+}
+
+function strap::sys::strace() {
+  local -r stack_size="${#FUNCNAME[@]}"
+  local i=1 # don't print out this function itself - it's always last and doesn't help
+  while [[ $i < $stack_size ]]; do
+    local lineno="${BASH_LINENO[$(( i - 1 ))]}"
+    local func="${FUNCNAME[$i]}";
+    local src="${BASH_SOURCE[$i]}";
+
+    if [[ ! -f "${src}" ]]; then
+
+      # try to find if $func is defined in our standard sys.sh source file:
+      local testsrc="${STRAP_LIB_DIR}/sys.sh"
+      local foundno="$(grep -En "${func}[[:space:]]*[(]?[)]?[[:space:]]*{\$" ${testsrc} | awk -F':' '{print $1}' || true)"
+
+      if [[ -z "${foundno}" ]]; then
+        # Not in sys.sh - try $STRAP_SCRIPT
+        testsrc="${STRAP_SCRIPT}"
+        foundno="$(grep -En "${func}[[:space:]]*[(]?[)]?[[:space:]]*{\$" ${testsrc} | awk -F':' '{print $1}' || true)"
+      fi
+
+      if [[ -n "${foundno}" ]]; then
+        src="${testsrc}"
+        local lineadjust=1; [[ ${i} -eq 0 ]] && lineadjust=0
+        lineno=$((lineno + foundno + lineadjust))
+      fi
+    fi
+
+    # if we're in a terminal (e.g. not being piped), print color output to stderr, otherwise don't:
+    if [[ -t 2 ]]; then
+      printf '    at %s (%s:%s)\n' \
+             "${FONT_LIGHT_SKYBLUE_1}${func}${FONT_CLEAR}" \
+             "${FONT_LIGHT_STEEL_BLUE_1}${src}${FONT_CLEAR}" \
+             "${FONT_SKYBLUE_2}${lineno}${FONT_CLEAR}" \
+             >&2
+    else
+      printf '    at %s (%s:%s)\n' "${func}" "${src}" "${lineno}" >&2
+    fi
+
+    i=$((i + 1))
+  done
+}
+
+function strap::err::abort() {
+  local msg="${1:-}"
+  strap::err::println
+  strap::err::println
+  [[ -z "${msg}" ]] || strap::err::println '[abort] ' "${msg}"
+  strap::sys::strace
+  exit 1
+}
+
+function strap::err::cmd_exit() {
+  [[ $# -eq 0 ]] || strap::err::println "${STRAP_USER_COMMAND}: $@"
+  exit 1
+}
+
+function strap::err::cmd_invalid() {
+
+  local -r cmd="${1:-}" subcmd="${2:-}"
+  strap::assert::has_length "${cmd}" '$1 must be a strap command'
+  strap::assert::has_length "${subcmd}" '$2 must be the subcommand'
+
+  strap::err::println "${cmd}: unknown command '${subcmd}'"
+  strap::err::println --plain "See '${cmd} --help' for available commands."
 }
 
 set +a
