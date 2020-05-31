@@ -53,7 +53,7 @@ To install strap, run the following on the command line:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/strapsh/strap/master/install | bash
-source "$HOME/.strap/etc/straprc"
+source "$HOME/.strap/releases/current/etc/straprc"
 ```
 
 ## Usage
