@@ -286,7 +286,6 @@ strap::ansible::playbook::run() {
     case "$1" in
       --playbook|--with-playbook)
         playbook_file="${2}"
-        [[ -f "${playbook_file}" ]] || strap::abort "strap run: ${playbook_file} doesn't exist!"
         shift 2
         ;;
       -i|--inventory|--inventory-file)
@@ -312,6 +311,27 @@ strap::ansible::playbook::run() {
 
   if [[ "${#params[@]}" -gt 0 ]]; then
     set -- "${params[@]}" # reset positional arguments
+  fi
+
+  # Check if we need to download the specified playbook
+  if [[ "${playbook_file}" != '/'* && "${playbook_file//[!\/]}" == '/' && "${playbook_file}" != *':'* ]]; then
+    # doesn't start with a slash, but contains exactly one, so our heuristics mean this is a github fragment
+    local -r github_frag="${playbook_file}"
+    local -r github_ref="master" # allow overriding this?
+    local -r github_url="${STRAP_ANSIBLE_GITHUB_URL_PREFIX}/${github_frag}/archive/${github_ref}.zip" 
+    local -r playbook_zip="${STRAP_ANSIBLE_PLAYBOOKS_DIR}/${github_frag/\//-}-${github_ref}.zip"
+    playbook_dir="${STRAP_ANSIBLE_PLAYBOOKS_DIR}/${github_frag}-${github_ref}"
+    playbook_file="${playbook_dir}/main.yml" # default top level playbook file
+
+    # all runs start fresh:
+    rm -rf "${playbook_dir}"
+    rm -rf "${STRAP_ANSIBLE_LOG_FILE}"
+    mkdir -p "${playbook_dir}" 2>/dev/null
+    curl -fsSL "${github_url}" -o "${playbook_zip}" && unzip -qn "${playbook_zip}" -d "${playbook_dir%/*}" 
+  fi
+
+  if [[ ! -f "${playbook_file}" ]] ; then
+    strap::abort "strap run: ${playbook_file} doesn't exist!"
   fi
 
   playbook_dir="$(dirname $playbook_file)"
