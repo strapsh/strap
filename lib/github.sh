@@ -138,74 +138,24 @@ strap::github::api::token::create() {
 
   local -r machine_desc="$(strap::os::model)"
 
-  while [[ -z "$token" && ${password_attempts} < ${max_password_attempts} ]]; do
+  while [[ -z "$token" ]]; do
+  
+    if [ "$(uname -s)" == "Darwin" ]; then
+      open https://github.com/settings/tokens/new
+    elif [ "$(uname -s)" == "Linux" ]; then
+      gio open https://github.com/settings/tokens/new
+    fi
+    echo "Please login to Github, and visit https://github.com/settings/tokens/new to create a personal access token. Make sure the following scopes are selected: repo, admin:org, admin:public_key, admin:repo_hook, admin:org_hook, gist, notifications, user, delete_repo, admin:gpg_key. Once created, copy and paste the token into Strap."
 
     echo
-    strap::readval password "Enter (or cmd-v paste) your GitHub password" true
-    creds="$username:$password"
+    strap::readval token "Enter (or cmd-v paste) your Token once you have generated it" true
 
-    utc_date="$(date -u +%FT%TZ)"
-    token_description="Strap auto-generated token created at $utc_date for $machine_desc"
-    request_body="{\"scopes\":[\"repo\",\"admin:org\",\"admin:public_key\",\"admin:repo_hook\",\"admin:org_hook\",\"gist\",\"notifications\",\"user\",\"delete_repo\",\"admin:gpg_key\"],\"note\":\"$token_description\",\"note_url\":\"https://github.com/strapsh/strap\"}"
-    response="$(curl --silent --show-error -i -u "$creds" -H 'Content-Type: application/json' -X POST -d "$request_body" https://api.github.com/authorizations)"
-    status_code="$(echo "$response" | head -1 | awk '{print $2}')"
-    headers="$(echo "$response" | sed "/^\s*$(printf '\r')*$/q" | sed '/^[[:space:]]*$/d' | tail -n +2)"
-    body="$(echo "$response" | sed "1,/^\s*$(printf '\r')*$/d")"
-    token="$(echo "$body" | jq -r '.token // empty')"
-
-    password_attempts=$((password_attempts + 1))
-
-    strap::assert::has_length "$status_code" 'Unable to parse GitHub response status.  GitHub response format is likely to have changed.  Please report this to the Strap developers.'
-
-    if [[ ${status_code} -eq 401 ]]; then
-
-      if echo "$headers" | grep -q 'X-GitHub-OTP: required'; then # password correct but two-factor is required
-
-        # the password was correct, so set the attempts equal to max to prevent looping through again:
-        password_attempts=${max_password_attempts}
-
-        while [[ -z "$token" && ${otp_attempts} < ${max_otp_attempts} ]]; do
-
-          echo
-          strap::readval two_factor_code "Enter GitHub two-factor code"
-
-          #try again with the OTP code:
-          utc_date="$(date -u +%FT%TZ)"
-          token_description="Strap auto-generated token created at $utc_date for $machine_desc"
-          request_body="{\"scopes\":[\"repo\",\"admin:org\",\"admin:public_key\",\"admin:repo_hook\",\"admin:org_hook\",\"gist\",\"notifications\",\"user\",\"delete_repo\",\"admin:gpg_key\"],\"note\":\"$token_description\",\"note_url\":\"https://github.com/strapsh/strap\"}"
-          response="$(curl --silent --show-error -i -u "$creds" -H "X-GitHub-OTP: $two_factor_code" -H 'Content-Type: application/json' -X POST -d "$request_body" https://api.github.com/authorizations)"
-          status_code="$(echo "$response" | head -1 | awk '{print $2}')"
-          headers="$(echo "$response" | sed "/^\s*$(printf '\r')*$/q" | sed '/^[[:space:]]*$/d' | tail -n +2)"
-          body="$(echo "$response" | sed "1,/^\s*$(printf '\r')*$/d")"
-          token="$(echo "$body" | jq -r '.token // empty')"
-          otp_attempts=$((otp_attempts + 1))
-
-          if [[ -z "$token" ]]; then
-            retry_ask=''
-            [[ ${otp_attempts} < ${max_otp_attempts} ]] && retry_ask=' Please try again.'
-            strap::error "GitHub rejected the specified two-factor code (perhaps due to a typo or it expired at the last second?).$retry_ask"
-          fi
-        done
-      else
-        retry_ask=''
-        [[ ${password_attempts} < ${max_password_attempts} ]] && retry_ask=' Please try again.'
-        strap::error "GitHub rejected the specified password (perhaps due to a typo?).$retry_ask"
-      fi
-
+    if ! strap::github::api::token::is_valid "$token"; then
+        strap::action "The token you created is invalid. Please try again."
+        token='' # clear to ensure a new one is created next
     fi
 
   done
-
-  if [[ -z "$token" ]]; then
-    #default message if attempts weren't exceeded:
-    local msg="Unable to parse GitHub response API Token. GitHub response format may have changed. Please report this to the Strap developers.  GitHub HTTP response: $response"
-    if [[ "$otp_attempts" == "$max_otp_attempts" ]]; then
-      msg="Reached maximum number of two-factor attempts. Please ensure you're using the correct two-factor application for the '$username' GitHub account."
-    elif [[ "$password_attempts" == "$max_password_attempts" ]]; then
-      msg="Reached the maximum number of GitHub password attempts. Please locate the correct password for the '$username' GitHub account and then run Strap again"
-    fi
-    strap::abort "$msg"
-  fi
 
   # we have a token now - save it to secure storage:
   strap::github::token::save "$username" "$token"
@@ -214,12 +164,11 @@ strap::github::api::token::create() {
   response="$(curl --silent --show-error -i -H "Authorization: token $token" -H 'Content-Type: application/json' https://api.github.com/user/issues)"
   headers="$(echo "$response" | sed "/^\s*$(printf '\r')*$/q" | sed '/^[[:space:]]*$/d' | tail -n +2)"
   if echo "$headers" | grep -q 'X-GitHub-SSO:'; then
-    # Linux based system
-    if command -v gio >/dev/null; then
-      gio open https://github.com/settings/tokens
     # Mac
-    elif command -v open >/dev/null; then
+    if [ "$(uname -s)" == "Darwin" ]; then
       open https://github.com/settings/tokens
+    elif [ "$(uname -s)" == "Linux" ]; then
+      gio open https://github.com/settings/tokens
     fi
     echo "One or more of the Github Orgs you belong to requires that you to enable an SSO personal access token before proceeding. Visit https://github.com/settings/tokens in your web browser and authorize the token"
     echo
