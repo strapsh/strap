@@ -137,12 +137,13 @@ strap::github::api::token::create() {
   local retry_ask=
 
   local -r machine_desc="$(strap::os::model)"
+  local uname=''
+  uname="$(uname -s)"
 
   while [[ -z "$token" ]]; do
-  
-    if [ "$(uname -s)" == "Darwin" ]; then
+    if [ "$uname" == "Darwin" ]; then
       open https://github.com/settings/tokens/new
-    elif [ "$(uname -s)" == "Linux" ]; then
+    elif [ "$uname" == "Linux" ]; then
       gio open https://github.com/settings/tokens/new
     fi
     echo "Please login to Github, and visit https://github.com/settings/tokens/new to create a personal access token. Make sure the following scopes are selected: repo, admin:org, admin:public_key, admin:repo_hook, admin:org_hook, gist, notifications, user, delete_repo, admin:gpg_key. Once created, copy and paste the token into Strap."
@@ -164,10 +165,9 @@ strap::github::api::token::create() {
   response="$(curl --silent --show-error -i -H "Authorization: token $token" -H 'Content-Type: application/json' https://api.github.com/user/issues)"
   headers="$(echo "$response" | sed "/^\s*$(printf '\r')*$/q" | sed '/^[[:space:]]*$/d' | tail -n +2)"
   if echo "$headers" | grep -q 'X-GitHub-SSO:'; then
-    # Mac
-    if [ "$(uname -s)" == "Darwin" ]; then
+    if [ "$uname" == "Darwin" ]; then
       open https://github.com/settings/tokens
-    elif [ "$(uname -s)" == "Linux" ]; then
+    elif [ "$uname" == "Linux" ]; then
       gio open https://github.com/settings/tokens
     fi
     echo "One or more of the Github Orgs you belong to requires that you to enable an SSO personal access token before proceeding. Visit https://github.com/settings/tokens in your web browser and authorize the token"
