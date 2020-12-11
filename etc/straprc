@@ -8,7 +8,7 @@ if [[ -d "${HOME}/.strap/releases/current/bin" ]]; then
   export PATH="${HOME}/.strap/releases/current/bin:$PATH"
 fi
 
-if ([[ -n "${ZSH_VERSION}" ]] && setopt +o nomatch; ls -A "${HOME}"/.strap/etc/straprc.d/*.sh >/dev/null 2>&1); then
+if ([[ -n "${ZSH_VERSION}" ]] && setopt +o nomatch; ls "${HOME}"/.strap/etc/straprc.d/*.sh >/dev/null); then
   for file in "${HOME}"/.strap/etc/straprc.d/*.sh; do
     source "${file}"
   done
