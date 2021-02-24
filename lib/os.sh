@@ -33,8 +33,7 @@ strap::os::distro() {
   [[ -n "${STRAP_OS_DISTRO:-}" ]] && echo "${STRAP_OS_DISTRO}" && return 0 # cached, exit early
 
   local distro= output=
-  output="$(set -o pipefail; lsb_release -ds 2>/dev/null || cat /etc/*release 2>/dev/null | head -n1 || uname -om 2>/dev/null || uname -s)"
-
+  output="$(set -o pipefail; lsb_release -ds 2>/dev/null || uname -s || cat /etc/*release 2>/dev/null | head -n1 || uname -om 2>/dev/null)"
   case "${output}" in
     *Darwin*) distro='darwin' ;;
     *Ubuntu*) distro='ubuntu' ;;
