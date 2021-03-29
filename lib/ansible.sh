@@ -42,10 +42,14 @@ function strap::ansible::install() {
     if [[ "${ansible_version_installed}" != "${STRAP_ANSIBLE_VERSION}" ]]; then
       strap::exec python -m pip uninstall -y ansible
     fi
-    strap::exec python -m pip install ansible=="${STRAP_ANSIBLE_VERSION}"
+    ansible_base_version_installed=$(python -m pip show ansible-base | grep Version | cut -d' ' -f2) || true
+    if [[ "${ansible_version_installed}" != "${STRAP_ANSIBLE_VERSION}" ]]; then
+      strap::exec python -m pip uninstall -y ansible-base
+    fi
+    strap::exec python -m pip install ansible-base=="${STRAP_ANSIBLE_VERSION}"
   else
     strap::running "Ensuring strap virtualenv ansible"
-    strap::exec python -m pip install --upgrade ansible
+    strap::exec python -m pip install --upgrade ansible-base
   fi
   strap::ok
 
