@@ -44,6 +44,19 @@ strap::brew::init() {
       if [[ "$homebrew_exit_code" -ne 0 ]]; then echo "Homebrew installation failed." >&2; exit 1; fi
     )
   fi
+
+  strap::action "determining Homebrew prefix"
+  local osArch=$(uname -p)
+  export STRAP_HOMEBREW_PREFIX='/usr/local'
+
+  if [[ "${osArch}" == "arm" ]]; then
+    export STRAP_HOMEBREW_PREFIX='/opt/homebrew'
+    strap::running "arch: $(uname -p). using homebrew prefix $STRAP_HOMEBREW_PREFIX "
+  else
+    strap::running "arch: $(uname -p). using default homebrew prefix: $STRAP_HOMEBREW_PREFIX"
+  fi
+
+  eval $(${STRAP_HOMEBREW_PREFIX}/bin/brew shellenv) && echo "Using Homebrew - $(brew --version)"
   strap::ok
 
   STRAP_HOMEBREW_PREFIX="$(brew --prefix)"
