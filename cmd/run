@@ -29,6 +29,7 @@ STRAP_LIB_DIR="${STRAP_LIB_DIR:-}"; [[ -n "$STRAP_LIB_DIR" ]] || strap::abort "S
 STRAP_INTERACTIVE="${STRAP_INTERACTIVE:-}"; [[ -n "$STRAP_INTERACTIVE" ]] || strap::abort "STRAP_INTERACTIVE is not set"
 STRAP_ROOT_ALLOWED="${STRAP_ROOT_ALLOWED:-}"; [[ -n "$STRAP_ROOT_ALLOWED" ]] || STRAP_ROOT_ALLOWED=false # for CI reasons only
 STRAP_GITHUB_ENABLED="${STRAP_GITHUB_ENABLED:-}"; [[ -n "$STRAP_GITHUB_ENABLED" ]] || STRAP_GITHUB_ENABLED=true
+STRAP_GITHUB_DISALLOW_PRIVATE_EMAIL="${STRAP_GITHUB_DISALLOW_PRIVATE_EMAIL:-}"
 
 CLT_PLACEHOLDER="${CLT_PLACEHOLDER:-}"
 STRAP_STEP=''
@@ -222,6 +223,10 @@ EOF
   strap::running "Checking git config user.email"
   STRAP_GIT_EMAIL="${STRAP_GIT_EMAIL:-}"
   local __strap_git_email="$(git config --global user.email || true)"
+  if [[ -n "${STRAP_GITHUB_DISALLOW_PRIVATE_EMAIL}" && -n "$__strap_git_email" && ! "$__strap_git_email" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9]+\.[A-Za-z]{2,4}$ ]]; then
+  echo "Your existing GitHub email is invalid. Please make sure to use your public Github email address, not the private noreply version"
+  __strap_git_email=''
+  fi
   if [[ -z "$__strap_git_email" ]]; then # not set in git config, fall back to env var:
 
     __strap_git_email="$STRAP_GIT_EMAIL"
@@ -232,8 +237,14 @@ EOF
     fi
 
     # If not set yet and interactive, prompt user:
-    if [[ -z "$__strap_git_email" && "$STRAP_INTERACTIVE" == "true" ]]; then
-    strap::readval __strap_git_email "Enter your email address" false true
+    if [[ "$STRAP_INTERACTIVE" == "true" ]]; then
+    while [[ -z "$__strap_git_email" ]]; do
+    	strap::readval __strap_git_email "Enter your public GitHub email address" false true
+        if [[ -n "${STRAP_GITHUB_DISALLOW_PRIVATE_EMAIL}" && -n "$__strap_git_email" && ! "$__strap_git_email" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9]+\.[A-Za-z]{2,4}$ ]]; then
+            echo "Your GitHub email is invalid. Please make sure to use your public Github email address, not the private noreply version"
+            __strap_git_email=''
+        fi
+    done
     fi
 
     if [[ -n "$__strap_git_email" ]]; then # store if found
