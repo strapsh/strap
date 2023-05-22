@@ -17,7 +17,7 @@ fi
 
 STRAP_DEBUG="${STRAP_DEBUG:-}" && [[ -n "$STRAP_DEBUG" ]] && set -x
 STRAP_HOME="${STRAP_HOME:-}" && [[ -z "$STRAP_HOME" ]] && echo "STRAP_HOME is not set" && exit 1
-STRAP_VERSION="0.0.1-SNAPSHOT"
+STRAP_VERSION="${STRAP_HOME##*/}"
 
 main() {
 
