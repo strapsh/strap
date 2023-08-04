@@ -146,7 +146,7 @@ strap::github::api::token::create() {
     elif [ "$uname" == "Linux" ]; then
       gio open https://github.com/settings/tokens/new
     fi
-    echo "Please login to Github, and visit https://github.com/settings/tokens/new to create a personal access token. Make sure the following scopes are selected: repo, admin:org, admin:public_key, admin:repo_hook, admin:org_hook, gist, notifications, user, delete_repo, admin:gpg_key. Once created, copy and paste the token into Strap."
+    echo "Please login to Github, and visit https://github.com/settings/tokens/new to create a personal access token. Make sure the following scopes are selected: repo, read:org under admin:org, and read:public_key under admin:public_key. Once created, copy and paste the token into Strap."
 
     echo
     strap::readval token "Enter (or cmd-v paste) your Token once you have generated it" true
