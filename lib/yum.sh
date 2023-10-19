@@ -35,4 +35,5 @@ strap::yum::init() {
   #  fi
   #  sudo yum-config-manager --enable ius-archive
   #fi
+  echo "test"
 }
