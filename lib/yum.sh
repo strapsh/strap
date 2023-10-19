@@ -25,14 +25,14 @@ strap::yum::pkg::install() {
 # on the host OS before strap is run.
 ##
 strap::yum::init() {
-  if ! strap::yum::pkg::is_installed 'epel-release'; then # needed for jq and maybe others
-    strap::yum::pkg::install 'epel-release'
-  fi
-  if ! strap::yum::pkg::is_installed 'ius-release'; then # needed for git2u (up to date git and git-credential-libsecret) and python3
-    strap::yum::pkg::install 'https://repo.ius.io/ius-release-el7.rpm'
-    if ! strap::yum::pkg::is_installed 'yum-utils'; then
-        strap::yum::pkg::install 'yum-utils'
-    fi
-    sudo yum-config-manager --enable ius-archive
-  fi
+  #if ! strap::yum::pkg::is_installed 'epel-release'; then # needed for jq and maybe others
+  #  strap::yum::pkg::install 'epel-release'
+  #fi
+  #if ! strap::yum::pkg::is_installed 'ius-release'; then # needed for git2u (up to date git and git-credential-libsecret) and python3
+  #  strap::yum::pkg::install 'https://repo.ius.io/ius-release-el7.rpm'
+  #  if ! strap::yum::pkg::is_installed 'yum-utils'; then
+  #      strap::yum::pkg::install 'yum-utils'
+  #  fi
+  #  sudo yum-config-manager --enable ius-archive
+  #fi
 }
