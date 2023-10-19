@@ -173,11 +173,11 @@ EOF
     if command -v git >/dev/null && ! git help -a | grep -q credential-libsecret; then
       # old git install without git-credential-libsecret.  Remove it and replace with git2u
       strap::action 'Removing out-of-date and/or incompatible git package'
-      sudo yum -y erase git >/dev/null 2>&1 || true
+      #sudo yum -y erase git >/dev/null 2>&1 || true
       strap::ok
     fi
   fi
-  strap::pkgmgr::pkg::ensure "$git_package_name"
+  #strap::pkgmgr::pkg::ensure "$git_package_name"
 
   command -v curl >/dev/null || strap::pkgmgr::pkg::ensure 'curl' # needed to communicate with github api
   strap::pkgmgr::pkg::ensure 'jq' # needed for parsing github api JSON responses
