@@ -50,10 +50,10 @@ function strap::python::install() {
       pythoncmd="${pythonpkg}"
       ;;
     *)
-      pythonpkg='python36'
+      pythonpkg='python'
       pippkg="${pythonpkg}-pip"
       venvpkg="${pythonpkg}-virtualenv"
-      pythoncmd='python3.6'
+      pythoncmd='python'
       ;;
   esac
 
