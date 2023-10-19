@@ -34,6 +34,10 @@ function strap::python::install() {
       pythonpkg='python'
       pythoncmd='python3'
       ;;
+    linux)
+      pythonpkg='python'
+      pythoncmd='python'
+      ;;
     ubuntu)
       pythonpkg='python3.7'
       [[ "$(strap::os::version)" == '14'* ]] && pythonpkg='python3.6' # python 3.7 on 14.04 has pip ssl problems
