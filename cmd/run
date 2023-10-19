@@ -237,7 +237,7 @@ EOF
     fi
 
     # If not set yet and interactive, prompt user:
-    if [[ "$STRAP_INTERACTIVE" == "true" ]]; then
+    if [[ "$STRAP_INTERACTIVE" == "true" && "$STRAP_GITHUB_ENABLED" == "true" ]]; then
     while [[ -z "$__strap_git_email" ]]; do
     	strap::readval __strap_git_email "Enter your public GitHub email address" false true
         if [[ -n "${STRAP_GITHUB_DISALLOW_PRIVATE_EMAIL}" && -n "$__strap_git_email" && ! "$__strap_git_email" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9]+\.[A-Za-z]{2,4}$ ]]; then
