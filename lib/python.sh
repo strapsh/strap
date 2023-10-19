@@ -27,6 +27,8 @@ function strap::python::install() {
 
   distro="$(strap::os::distro)"
 
+  echo "${distro}" >&2
+
   case "${distro}" in
     darwin)
       pythonpkg='python'
