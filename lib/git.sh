@@ -31,9 +31,13 @@ strap::git::credential::helper::ensure() {
 
   local helper="$(git config --global 'credential.helper' 2>/dev/null || true)"
   if [[ -z "$helper" ]]; then
-    helper='osxkeychain' # mac
-    git help -a | grep -q "credential-${helper}" || helper='libsecret' # try linux
-    git help -a | grep -q "credential-${helper}" || helper='store' # fall back to file storage
+    if [[ -n "$STRAP_GIT_CREDENTIAL_HELPER" ]]; then
+      helper="$STRAP_GIT_CREDENTIAL_HELPER"
+    else
+      helper='osxkeychain' # mac
+      git help -a | grep -q "credential-${helper}" || helper='libsecret' # try linux
+      git help -a | grep -q "credential-${helper}" || helper='store' # fall back to file storage
+    fi
   fi
 
   strap::git::config::ensure 'credential.helper' "$helper"
