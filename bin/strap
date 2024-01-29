@@ -114,7 +114,7 @@ export STRAP_PLUGIN_LIB_DIR="$STRAP_LIB_DIR"
 export STRAP_PLUGIN_CMD_DIR="$STRAP_CMD_DIR"
 
 . "$STRAP_LIB_DIR/lib.sh" || . ../lib/lib.sh
-strap::lib::import fonts || . ../lib/fonts.sh
+# strap::lib::import fonts || . ../lib/fonts.sh
 strap::lib::import logging || . ../lib/logging.sh
 strap::lib::import io || . ../lib/io.sh
 
