@@ -6,7 +6,7 @@ if ! command -v strap::lib::import >/dev/null; then
   [[ "${BASH_SOURCE[0]}" != "${0}" ]] && return 1 || exit 1 # if sourced, return 1, else running as a command, so exit
 fi
 
-strap::lib::import fonts || . fonts.sh
+# strap::lib::import fonts || . fonts.sh
 
 set -a
 
