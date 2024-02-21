@@ -16,7 +16,7 @@ strap::lib::import exec || . exec.sh
 
 STRAP_HOME="${STRAP_HOME:-}"; [[ -n "$STRAP_HOME" ]] || { echo "STRAP_HOME is not set" >&2; exit 1; }
 STRAP_USER_HOME="${STRAP_USER_HOME:-}"; [[ -n "$STRAP_USER_HOME" ]] || { echo "STRAP_USER_HOME is not set" >&2; exit 1; }
-STRAP_INTERACTIVE="${STRAP_INTERACTIVE:-}"; [[ -n "$STRAP_INTERACTIVE" ]] || STRAP_INTERACTIVE=true
+STRAP_SUDO_PROMPT="${STRAP_SUDO_PROMPT:-$STRAP_INTERACTIVE}"; [[ -n "$STRAP_SUDO_PROMPT" ]] || STRAP_SUDO_PROMPT=true
 STRAP_ANSIBLE_VERSION="${STRAP_ANSIBLE_VERSION:-}"
 STRAP_ANSIBLE_DIR="${STRAP_USER_HOME}/ansible"
 STRAP_ANSIBLE_LOG_FILE="${STRAP_ANSIBLE_DIR}/ansible.log"
@@ -139,7 +139,7 @@ function strap::ansible::roles::run() {
     esac
   done
 
-  if [[ "${STRAP_INTERACTIVE}" == true ]]; then # false in CI
+  if [[ "${STRAP_SUDO_PROMPT}" == true ]]; then # false in CI
     params+=( '--ask-become-pass' )
   fi
 
@@ -271,7 +271,7 @@ EOF
     export ANSIBLE_LOG_PATH="${STRAP_ANSIBLE_LOG_FILE}"
     strap::ansible-galaxy-install -r "${requirements_file}"
     printf '\nRunning ansible to manage localhost.'
-    if [[ "${STRAP_INTERACTIVE}" == true ]]; then
+    if [[ "${STRAP_SUDO_PROMPT}" == true ]]; then
       printf ' Please enter your SUDO/' # make the --ask-become-pass prompt more visible/obvious
     else
       printf '\n'
@@ -309,7 +309,7 @@ strap::ansible::playbook::run() {
     esac
   done
 
-  if [[ "${STRAP_INTERACTIVE}" == true ]]; then # false in CI
+  if [[ "${STRAP_SUDO_PROMPT}" == true ]]; then # false in CI
     params+=( '--ask-become-pass' )
   fi
 
@@ -347,7 +347,7 @@ strap::ansible::playbook::run() {
     export ANSIBLE_LOG_PATH="${STRAP_ANSIBLE_LOG_FILE}"
     [[ -f "${requirements_file}" ]] && strap::ansible-galaxy-install -r "${requirements_file}" --force
     printf '\nRunning ansible to manage localhost.'
-    if [[ "${STRAP_INTERACTIVE}" == true ]]; then
+    if [[ "${STRAP_SUDO_PROMPT}" == true ]]; then
       printf ' Please enter your SUDO/' # make the --ask-become-pass prompt more visible/obvious
     else
       printf '\n'
